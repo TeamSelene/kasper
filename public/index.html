@@ -68,12 +68,14 @@ var wavelengths = [512.6, 518.4, 524.7, 530.4, 536.5, 542.8, 548.7, 554.5, 560.5
                2564.0, 2572.0, 2579.9, 2587.9];
 
 var popup = null;
+let refGraph = null;
   var map = L.map('map', {
                     crs: L.CRS.EPSG4326,
                     center: [0, 0],
-                    zoom: 2,
+                    zoom: 0,
                     layers: baseLayers
   });
+
 
   var wmsLayer = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
      layers: 'LOLA_color'
@@ -118,53 +120,53 @@ var popup = null;
       layer.on('click', function (e) {
         map.panTo(L.latLng(point.coordinates[1], point.coordinates[0]));
         console.log(point);
-        var ctx = document.getElementById('refGraph');
+        let ctx = document.getElementById('refGraph');
 
-        let ref = point.ref1;
-        console.log(ref);
 
-        let chdata = {
-          labels: wavelengths,
-          datasets: [
-              {
-                  label: "REF 1",
-                  lineTension: 0.1,
-                  borderColor: "rgba(75,192,192,1)",
-                  borderWidth: 1,
-                  pointBorderColor: "rgba(75,192,192,1)",
-                  pointBackgroundColor: "#fff",
-                  pointBorderWidth: 1,
-                  pointHoverRadius: 5,
-                  pointHoverBackgroundColor: "rgba(75,192,192,1)",
-                  pointHoverBorderColor: "rgba(220,220,220,1)",
-                  pointHoverBorderWidth: 2,
-                  pointRadius: 1,
-                  pointHitRadius: 10,
-                  data: ref,
-                  spanGaps: false,
-              }
-          ]
-      };
+        $.getJSON(`api/image/${point.eid}/${point.index}`, (data) => {
+          const ref = binArray2FloatArray(data.Image.ref1);
+          let chdata = {
+            labels: wavelengths,
+            datasets: [
+                {
+                    label: "REF 1",
+                    lineTension: 0.1,
+                    borderColor: "rgba(75,192,192,1)",
+                    borderWidth: 1,
+                    pointBorderColor: "rgba(75,192,192,1)",
+                    pointBackgroundColor: "#fff",
+                    pointBorderWidth: 1,
+                    pointHoverRadius: 5,
+                    pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                    pointHoverBorderColor: "rgba(220,220,220,1)",
+                    pointHoverBorderWidth: 2,
+                    pointRadius: 1,
+                    pointHitRadius: 10,
+                    data: ref,
+                    spanGaps: false,
+                }
+            ]
+        };
+        refGraph = new Chart(ctx, {
+            type: 'line',
+            data: chdata,
+            height: 400,
+            options: {
 
-        let refGraph = new Chart(ctx, {
-          type: 'line',
-          data: chdata,
-          height: 400,
-          options: {
-
-               scales: {
-                yAxes: [{
-                  ticks: {
-                    min: 0,
-                    max: 1,
-                    stepSize: 0.1,
-                  },
-                }],
-              },
-            showlines: true,
+                 scales: {
+                  yAxes: [{
+                    ticks: {
+                      min: 0,
+                      max: 1,
+                      stepSize: 0.1,
+                    },
+                  }],
+                },
+              showlines: true,
+            }
           }
-        }
-      );
+        );
+        });
       });
     }
 
