@@ -1,6 +1,7 @@
 $(window).on("load", () => {
     $.getJSON('api/images', (data) => {
       console.log(data);
+      plotPoints(geoJSONLayer, data.Images)
     });
 });
 
@@ -9,10 +10,10 @@ function plotPoints(geoJSONLayer, data) {
     let geoDataPoints = data.map(elem =>
         elem.pts.map(point =>
             ({
-                  type: point.loc.type,
+                type: point.loc.type,
                 coordinates: point.loc.coordinates,
-                ref1: binArray2FloatArray(point.ref1.$binary),
-                ref2: binArray2FloatArray(point.ref2.$binary)
+                ref1: binArray2FloatArray(point.ref1),
+                ref2: binArray2FloatArray(point.ref2)
             })
         ))
         .reduce((a, b) => a.concat(b), [])
@@ -20,6 +21,7 @@ function plotPoints(geoJSONLayer, data) {
 }
 
 function binArray2FloatArray(string) {
+    console.log(string);
     let byteArray = base64js.toByteArray(string);
     return new Float32Array(byteArray.buffer);
 }
