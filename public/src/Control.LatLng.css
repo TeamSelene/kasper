@@ -1,0 +1,14 @@
+.leaflet-control-latlng input {
+	width: 75px;
+	display: block;
+	color: black;
+	padding: 1px 4px;
+	border: 0px;
+	font-size: 12px;
+	background: rgba(255, 255, 255, 0.8);
+	margin: 2px;
+	text-align: right;
+}
+.leaflet-control-latlng input:hover{
+	background-color: white;
+}

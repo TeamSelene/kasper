@@ -1,0 +1,12 @@
+{
+    "name": "kasper",
+    "version": "1.0.0",
+    "dependencies": {
+        "bootstrap": "latest",
+        "jquery": "latest",
+        "angular": "latest",
+        "angular-route": "latest",
+        "chart.js": "latest"
+
+    }
+}
