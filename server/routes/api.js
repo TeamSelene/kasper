@@ -13,7 +13,7 @@ router.get('/images', (req, res) => {
   let images  =   db.get(COLLECTION);
 
 
-  images.find({}, { limit:20, fields: "pts.loc pts.ref1 pts.ref2" }, (err, items) => {
+  images.find({}, { limit:40  , fields: "pts.loc" }, (err, items) => {
     if(items.length > 0) {
       data["error"]   =   0;
       data["Images"]  =   items;
@@ -22,6 +22,25 @@ router.get('/images', (req, res) => {
     else {
       data["error"]   =   1;
       data["Images"]  =   "No Images Found";
+      res.json(data);
+    }
+  });
+});
+
+router.get('/image/:id/:in', (req, res) => {
+  let data    =   {};
+  let images  =   db.get(COLLECTION);
+
+
+  images.find({_id: req.params.id }, { fields: " pts.ref1 pts.ref2 " }, (err, items) => {
+    if(items.length > 0) {
+      data["error"]   =   0;
+      data["Image"]  =   items[0].pts[req.params.in];
+      res.json(data);
+    }
+    else {
+      data["error"]   =   1;
+      data["Images"]  =   "No Image Found";
       res.json(data);
     }
   });
