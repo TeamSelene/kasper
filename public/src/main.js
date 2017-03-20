@@ -8,14 +8,18 @@ function plotPoints(geoJSONLayer, data) {
     // Grab the points of every element.
     let geoDataPoints = data.map(elem => {
       let e = elem._id;
-      return elem.pts.map(point =>
-            ({
+      let i = 0;
+      return elem.pts.map(point => {
+            let pt = {
                 eid: elem._id,
-                index: 0,
+                index: i,
                 type: point.loc.type,
                 coordinates: point.loc.coordinates,
-            })
-        )
+            };
+            i += 1;
+            return pt;
+          }
+        );
       })
         .reduce((a, b) => a.concat(b), []);
     geoJSONLayer.addData(geoDataPoints);
