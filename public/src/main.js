@@ -7,7 +7,6 @@ $(window).on("load", () => {
 function plotPoints(geoJSONLayer, data) {
     // Grab the points of every element.
     let geoDataPoints = data.map(image => {
-      let e = image._id;
       let i = 0;
       return image.pts.map(point => {
             let pt = {
