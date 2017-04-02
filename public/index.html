@@ -29,9 +29,9 @@
     <div class="toolbar">
       <form>
         Query: <input type="text" name="query" id="query" />
-        <input type="submit" value="Submit" onclick="updateQuery(document.getElementById(query).value)" />
+        <input type="submit" value="Submit" onclick="makeQuery(document.getElementById(query).value)" />
       </form>
-      
+
     </div>
     <div id='map' class='map'></div>
 
@@ -96,6 +96,8 @@ let refGraph = null;
       layer.on('click', (e) => {
       map.panTo(L.latLng(point.coordinates[1], point.coordinates[0]));
 
+      console.log(map.center);
+
       $('#refGraph').remove();
       $('#ref-box').append('<canvas id="refGraph" width="800" height="300"></canvas>');
       console.log(point);
@@ -104,6 +106,13 @@ let refGraph = null;
     });
   }
 
+  function makeQuery(query){
+    console.log("succ");
+    let split = query.split(" ");
+    if(split[0].toLowerCase() === "near" && split.length == 3){
+      console.log("succ");
+    }
+  }
 
   L.control.layers(baseLayers).addTo(map);
 
