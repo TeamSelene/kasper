@@ -27,6 +27,26 @@ router.get('/images', (req, res) => {
   });
 });
 
+router.get('/near/:lat/lng', (req, res) => {
+  let data    =   {};
+  let images  =   db.get(COLLECTION);
+
+
+  images.find({"loc" : {$near:{$geometry:{"type": "Point", "coordinates" : [req.params.lat, req.params.lng]}}}},
+              { limit:40  , fields: "pts.loc" }, (err, items) => {
+                if(items.length > 0) {
+                  data["error"]   =   0;
+                  data["Images"]  =   items;
+                  res.json(data);
+                }
+                else {
+                  data["error"]   =   1;
+                  data["Images"]  =   "No Images Found";
+                  res.json(data);
+                }
+              });
+});
+
 router.get('/image/:id/:in', (req, res) => {
   let data    =   {};
   let images  =   db.get(COLLECTION);
