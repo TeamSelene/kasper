@@ -27,6 +27,10 @@
 </head>
 <body>
     <div class="toolbar">
+      <form>
+        Query: <input type="text" name="query" id="query" />
+        <input type="submit" value="Submit" onclick="updateQuery(document.getElementById(query).value)" />
+      </form>
       
     </div>
     <div id='map' class='map'></div>
