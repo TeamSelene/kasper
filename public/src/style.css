@@ -1,0 +1,7 @@
+.toolbar {
+  width: 800px;
+  height: 150px;
+  background: #F3ECD1;
+  border: 1px solid lightgrey;
+  box-shadow: 2px 0px 10px lightgrey;
+}
