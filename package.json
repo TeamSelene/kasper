@@ -4,7 +4,7 @@
   "description": "KAguya Spectral Profiler ExploreR",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "start": "node server.js"
   },
   "repository": {
@@ -22,5 +22,9 @@
     "express": "^4.15.2",
     "mongodb": "^2.2.25",
     "monk": "^3.1.2"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.2.0"
   }
 }
