@@ -35,10 +35,34 @@ const wavelengths = [512.6, 518.4, 524.7, 530.4, 536.5, 542.8, 548.7, 554.5, 560
 
 
 $(window).on("load", () => {
+
+  let urlQuery = getParameterByName('query');
+
+  if(urlQuery){
+    console.log(urlQuery);
+    let split = urlQuery.split(" ");
+    if(split[0].toLowerCase() === "near" && split.length == 3){
+      let lat = parseFloat(split[1]);
+      let lng = parseFloat(split[2]);
+      console.log(lat);
+      let getstr = `api/near/${lat}/${lng}`;
+      map.panTo([lng, lat]);
+      $.getJSON(getstr, (data) => {
+        console.log(data);
+          plotPoints(geoJSONLayer, data.Images)
+      });
+    }
+  }
+  else{
     $.getJSON('api/images', (data) => {
         plotPoints(geoJSONLayer, data.Images)
     });
+  }
 });
+
+function updateQuery(query) {
+
+}
 
 function plotPoints(geoJSONLayer, data) {
     // Grab the points of every element.
@@ -112,4 +136,17 @@ function newChart(chdata) {
 function binArray2FloatArray(string) {
     let byteArray = base64js.toByteArray(string);
     return new Float32Array(byteArray.buffer);
+}
+
+
+function getParameterByName(name, url) {
+    if (!url) {
+      url = window.location.href;
+    }
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
