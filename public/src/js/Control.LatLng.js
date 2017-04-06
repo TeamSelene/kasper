@@ -1,5 +1,7 @@
 /**
- * Provide a control to change the center of the map to a certain LatLng.
+ * 	Provide a control to change the center of the map to a certain LatLng.
+ 		Modification of the leaflet plugin Leaflet.latlngcontrol
+ 		Github: https://github.com/jieter/Leaflet.latlngcontrol
  */
 L.Control.LatLng = L.Control.extend({
 	options: {
