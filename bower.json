@@ -5,7 +5,7 @@
         "bootstrap": "latest",
         "jquery": "latest",
         "chart.js": "latest",
-        "leaflet-dist": "latest"
+        "leaflet": "latest"
 
     }
 }
