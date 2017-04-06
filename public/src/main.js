@@ -84,6 +84,13 @@ $(window).on("load", () => {
 
     let geoJSONLayer = L.geoJSON(null, {
         onEachFeature: onEachFeature,
+        pointToLayer: function(feature, latlng) {
+          var dotIcon = new L.Icon({
+            iconUrl: 'red-dot-md.png',
+            iconSize:     [5, 5],
+          });
+          return L.marker(latlng, {icon: dotIcon});
+        },
     }).addTo(map);
 
     let urlQuery = getParameterByName('query');
