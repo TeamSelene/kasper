@@ -44,7 +44,7 @@ $(window).on("load", () => {
 
     let wmsLayer = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
         layers: 'LOLA_color'
-    });
+    }).addTo(map);
 
     let LOLA_Steel = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
         layers: 'LOLA_steel'
