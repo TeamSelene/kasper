@@ -211,7 +211,9 @@ function binArray2FloatArray(string) {
     let byteArray = base64js.toByteArray(string);
     return new Float32Array(byteArray.buffer);
 }
-
+/*
+  Taken from Stack Overflow answer: http://stackoverflow.com/a/901144/7286670
+*/
 function getParameterByName(name, url) {
     if (!url) {
         url = window.location.href;
