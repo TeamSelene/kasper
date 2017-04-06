@@ -1,127 +1,41 @@
 <!doctype html>
 <html>
+
 <head>
-  <meta charset="utf-8">
-  <title>Kasper</title>
-  <base href="/">
+    <meta charset="utf-8">
+    <title>Kasper</title>
+    <base href="/">
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
 
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
-  <link rel="stylesheet" href="src/Control.LatLng.css" />
-  <link rel="stylesheet" href="src/style.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
-  <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.js"></script>
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
-  <script src="src/Control.LatLng.js"></script>
-
-  <style>
-    #map {
-      width:800px;
-      height: 500px;
-    }
-  </style>
+    <link rel="stylesheet" href="src/Control.LatLng.css" />
+    <link rel="stylesheet" href="src/style.css" />
 </head>
+
 <body>
     <div class="toolbar">
-      <form>
-        Query: <input type="text" name="query" id="query" />
-        <input type="submit" value="Submit" onclick="makeQuery(document.getElementById(query).value)" />
-      </form>
-
+        <form>
+            Query: <input type="text" name="query" id="query" />
+            <input type="submit" value="Submit" onclick="makeQuery(document.getElementById(query).value)" />
+        </form>
     </div>
+
     <div id='map' class='map'></div>
 
-  <div id="ref-box" width="800" height="300" style="max-width:800px; max-height: 300px; float: left;">
-    <canvas id="refGraph" width="800" height="300"></canvas>
-  </div>
+    <div id="ref-box" width="800" height="300" style="max-width:800px; max-height: 300px; float: left;">
+        <canvas id="refGraph" width="800" height="300"></canvas>
+    </div>
 
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.js"></script>
+    <script src="src/Control.LatLng.js"></script>
+    <script src="lib/base64js.min.js"></script>
+    <script src="src/main.js"></script>
 </body>
-<script type="text/javascript">
 
-var popup = null;
-let refGraph = null;
-  var map = L.map('map', {
-                    crs: L.CRS.EPSG4326,
-                    center: [0, 0],
-                    zoom: 1,
-                    minZoom: 1,
-                    maxZoom: 12,
-                    layers: baseLayers
-  });
-
-
-  var wmsLayer = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
-     layers: 'LOLA_color'
-     }).addTo(map);
-
-  var LOLA_Steel = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
-     layers: 'LOLA_steel'
-     });
-
-  var LOLA_BW = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
-     layers: 'LOLA_bw'
-     });
-
-  var LROC_WAC = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
-     layers: 'LROC_WAC'
-     });
-
-  var KaguyaTC_Ortho = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
-     layers: 'KaguyaTC_Ortho'
-     });
-
-  var LO = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
-     layers: 'LO'
-     });
-
-  var UV_LO = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
-     layers: 'uv_lo'
-     });
-
-  var baseLayers = {
-    'USGS_Map Default (LOLA_Color)': wmsLayer,
-    'USGS_Map LOLA_Steel': LOLA_Steel,
-    'USGS_Map LOLA_BW': LOLA_BW,
-    'USGS_Map LROC_WAC': LROC_WAC,
-    'USGS_Map KaguyaTC_Ortho': KaguyaTC_Ortho,
-    'USGS_Map LO': LO,
-    'USGS_Map UV_LO': UV_LO
-  };
-
-
-  function onEachFeature(point, layer) {
-      layer.on('click', (e) => {
-      map.panTo(L.latLng(point.coordinates[1], point.coordinates[0]));
-
-      console.log(map.center);
-
-      $('#refGraph').remove();
-      $('#ref-box').append('<canvas id="refGraph" width="800" height="300"></canvas>');
-      console.log(point);
-      refGraph = createRefData(point);
-
-    });
-  }
-
-  function makeQuery(query){
-    console.log("succ");
-    let split = query.split(" ");
-    if(split[0].toLowerCase() === "near" && split.length == 3){
-      console.log("succ");
-    }
-  }
-
-  L.control.layers(baseLayers).addTo(map);
-
-  let geoJSONLayer = L.geoJSON(null, {
-    onEachFeature: onEachFeature,
-  }).addTo(map);
-
-</script>
-<script src="lib/base64js.min.js"></script>
-<script src="src/main.js"></script>
 </html>

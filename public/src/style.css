@@ -5,3 +5,8 @@
   border: 1px solid lightgrey;
   box-shadow: 2px 0px 10px lightgrey;
 }
+
+#map {
+    width: 800px;
+    height: 500px;
+}
