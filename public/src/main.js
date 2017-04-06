@@ -86,6 +86,28 @@ $(window).on("load", () => {
         onEachFeature: onEachFeature,
     }).addTo(map);
 
+    function onEachFeature(point, layer) {
+        layer.on('click', (e) => {
+            map.panTo(L.latLng(point.coordinates[1], point.coordinates[0]));
+
+            console.log(map.center);
+
+            $('#refGraph').remove();
+            $('#ref-box').append('<canvas id="refGraph" width="800" height="300"></canvas>');
+            console.log(point);
+            refGraph = createRefData(point);
+
+        });
+    }
+
+    function makeQuery(query) {
+        console.log("succ");
+        let split = query.split(" ");
+        if (split[0].toLowerCase() === "near" && split.length == 3) {
+            console.log("succ");
+        }
+    }
+
     let urlQuery = getParameterByName('query');
 
     if (urlQuery) {
@@ -108,28 +130,6 @@ $(window).on("load", () => {
         });
     }
 });
-
-function onEachFeature(point, layer) {
-    layer.on('click', (e) => {
-        map.panTo(L.latLng(point.coordinates[1], point.coordinates[0]));
-
-        console.log(map.center);
-
-        $('#refGraph').remove();
-        $('#ref-box').append('<canvas id="refGraph" width="800" height="300"></canvas>');
-        console.log(point);
-        refGraph = createRefData(point);
-
-    });
-}
-
-function makeQuery(query) {
-    console.log("succ");
-    let split = query.split(" ");
-    if (split[0].toLowerCase() === "near" && split.length == 3) {
-        console.log("succ");
-    }
-}
 
 function updateQuery(query) {
 
