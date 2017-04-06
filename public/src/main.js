@@ -87,7 +87,7 @@ $(window).on("load", () => {
         pointToLayer: function(feature, latlng) {
           var dotIcon = new L.Icon({
             iconUrl: 'red-dot-md.png',
-            iconSize:     [5, 5],
+            iconSize:     [10, 10],
           });
           return L.marker(latlng, {icon: dotIcon});
         },
@@ -211,7 +211,9 @@ function binArray2FloatArray(string) {
     let byteArray = base64js.toByteArray(string);
     return new Float32Array(byteArray.buffer);
 }
-
+/*
+  Taken from Stack Overflow answer: http://stackoverflow.com/a/901144/7286670
+*/
 function getParameterByName(name, url) {
     if (!url) {
         url = window.location.href;
