@@ -83,12 +83,28 @@ router.get('/image/:id/:in', (req, res) => {
       data["Image"]  =   items[0].pts[req.params.in];
       res.json(data);
     }
+
     else {
-      data["error"]   =   1;
-      data["Images"]  =   "No Image Found";
-      res.json(data);
+      // image ID is universally unique, if wasn't in images it could be in angles...
+      let angle = db.get(ANGLES)
+      angle.find({_id: req.params.id }, { fields: " pts.ref1 pts.ref2 " }, (err, items) => {
+        if(items.length > 0) {
+          data["error"]   =   0;
+          data["Image"]  =   items[0].pts[req.params.in];
+          res.json(data);
+        }
+        else {
+          // ...Or else does not exist
+          data["error"]   =   1;
+          data["Images"]  =   "No Image Found";
+          res.json(data);
+        }
+      });
     }
   });
 });
+
+
+
 
 module.exports = router;
