@@ -87,7 +87,7 @@ $(window).on("load", () => {
         pointToLayer: function(feature, latlng) {
           var dotIcon = new L.Icon({
             iconUrl: 'red-dot-md.png',
-            iconSize:     [10, 10],
+            iconSize:     [7, 7],
           });
           return L.marker(latlng, {icon: dotIcon});
         },
@@ -118,20 +118,27 @@ $(window).on("load", () => {
     let urlQuery = getParameterByName('query');
 
     if (urlQuery) {
-        console.log(urlQuery);
-        let split = urlQuery.split(" ");
-        if (split[0].toLowerCase() === "near" && split.length == 3) {
-            let lat = parseFloat(split[1]);
-            let lng = parseFloat(split[2]);
-            console.log(lat);
-            let getstr = `api/near/${lat}/${lng}`;
-            map.panTo([lng, lat]);
-            $.getJSON(getstr, (data) => {
-                console.log(data);
-                plotPoints(geoJSONLayer, data.Images)
-            });
+      console.log(urlQuery);
+      let getstr = 'api/';
+      let split = urlQuery.split(" ");
+      if (split[0].toLowerCase() === "near" && split.length == 3) {
+          let lat = parseFloat(split[1]);
+          let lng = parseFloat(split[2]);
+          console.log(lat);
+          getstr += `near/${lat}/${lng}`;
+          map.panTo([lng, lat]);
+      }
+      else if (split[0].toLowerCase() === "incidence" && split.length == 2) {
+          let ang = parseFloat(split[1]);
+          getstr += `incidence/${ang}`;
+
         }
-    } else {
+        $.getJSON(getstr, (data) => {
+            console.log(data);
+            plotPoints(geoJSONLayer, data.Images)
+        });
+    }
+    else {
         $.getJSON('api/images', (data) => {
             plotPoints(geoJSONLayer, data.Images)
         });
