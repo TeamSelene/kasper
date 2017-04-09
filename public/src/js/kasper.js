@@ -84,11 +84,11 @@ $(window).on("load", () => {
 
     let geoJSONLayer = L.geoJSON(null, {
         onEachFeature: onEachFeature,
-        pointToLayer: function(feature, latlng) {
-          var dotIcon = new L.DivIcon({
-            iconSize:     [7, 7],
+        pointToLayer: function(point, latlng) {
+          let dotIcon = new L.DivIcon({
+            iconSize:     [7, 10],
             className: 'leaflet-svg-icon',
-            html: `<svg width="7" height="7"><rect width="7" height="7" style="fill:rgb(0,0,255);" /></svg>`
+            html: `<svg width="7" height="10"><rect width="7" height="10" style="fill:rgb(0,0,255);stroke-width:1;stroke:rgb(0,0,50);" /></svg>`
           });
           return L.marker(latlng, {icon: dotIcon});
         },
@@ -98,7 +98,7 @@ $(window).on("load", () => {
     function onEachFeature(point, layer) {
         layer.on('click', (e) => {
             let loc = L.latLng(point.coordinates[1], point.coordinates[0]);
-            map.setZoomAround(loc,9);
+            map.setZoomAround(loc,8);
             map.panTo(loc);
             console.log(map.center);
 
@@ -142,7 +142,7 @@ $(window).on("load", () => {
         });
     }
     else {
-        $.getJSON('api/images', (data) => {
+        $.getJSON('api/points', (data) => {
             plotPoints(geoJSONLayer, data.Images)
         });
     }
