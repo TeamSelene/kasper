@@ -85,18 +85,21 @@ $(window).on("load", () => {
     let geoJSONLayer = L.geoJSON(null, {
         onEachFeature: onEachFeature,
         pointToLayer: function(feature, latlng) {
-          var dotIcon = new L.Icon({
-            iconUrl: 'red-dot-md.png',
+          var dotIcon = new L.DivIcon({
             iconSize:     [7, 7],
+            className: 'leaflet-svg-icon',
+            html: `<svg width="7" height="7"><rect width="7" height="7" style="fill:rgb(0,0,255);" /></svg>`
           });
           return L.marker(latlng, {icon: dotIcon});
         },
     }).addTo(map);
 
+    // On Each Feature - add click even to features to display new graph
     function onEachFeature(point, layer) {
         layer.on('click', (e) => {
-            map.panTo(L.latLng(point.coordinates[1], point.coordinates[0]));
-
+            let loc = L.latLng(point.coordinates[1], point.coordinates[0]);
+            map.setZoomAround(loc,9);
+            map.panTo(loc);
             console.log(map.center);
 
             $('#refGraph').remove();
