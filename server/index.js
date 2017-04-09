@@ -3,7 +3,7 @@ const path = require("path");
 const app = express();
 const http = require("http");
 const bodyParser = require("body-parser");
-const api = require('./server/routes/api');
+const api = require('./routes/api');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
