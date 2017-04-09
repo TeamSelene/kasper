@@ -9,12 +9,12 @@ const router  =   express.Router();
 const monk    =   require("monk");
 const db      =   monk(`${URL}:${PORT}/${DB}`);
 
-router.get('/images', (req, res) => {
+router.get('/points', (req, res) => {
   let data    =   {};
   let images  =   db.get(IMAGES);
 
 
-  images.find({}, { limit:40  , fields: "pts.loc" }, (err, items) => {
+  images.find({}, { limit:80  , fields: "pts.loc" }, (err, items) => {
     if(items.length > 0) {
       data["error"]   =   0;
       data["Images"]  =   items;
@@ -22,7 +22,7 @@ router.get('/images', (req, res) => {
     }
     else {
       data["error"]   =   1;
-      data["Images"]  =   "No Images Found";
+      data["Images"]  =   "No Points Found";
       res.json(data);
     }
   });
