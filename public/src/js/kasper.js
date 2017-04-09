@@ -138,12 +138,12 @@ $(window).on("load", () => {
         }
         $.getJSON(getstr, (data) => {
             console.log(data);
-            plotPoints(geoJSONLayer, data.Images)
+            plotPoints(geoJSONLayer, data.Points)
         });
     }
     else {
         $.getJSON('api/points', (data) => {
-            plotPoints(geoJSONLayer, data.Images)
+            plotPoints(geoJSONLayer, data.Points)
         });
     }
 });
@@ -170,7 +170,7 @@ function plotPoints(geoJSONLayer, data) {
 
 function createRefData(point) {
     $.getJSON(`api/image/${point.eid}/${point.index}`, (data) => {
-        const ref = binArray2FloatArray(data.Image.ref1);
+        const ref = binArray2FloatArray(data.ref1);
 
         let chdata = {
             labels: wavelengths,

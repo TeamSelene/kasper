@@ -17,12 +17,12 @@ router.get('/points', (req, res) => {
   images.find({}, { limit:80  , fields: "pts.loc" }, (err, items) => {
     if(items.length > 0) {
       data["error"]   =   0;
-      data["Images"]  =   items;
+      data["Points"]  =   items;
       res.json(data);
     }
     else {
       data["error"]   =   1;
-      data["Images"]  =   "No Points Found";
+      data["message"]  =   "No Points Found";
       res.json(data);
     }
   });
@@ -39,12 +39,12 @@ router.get('/near/:lat/:lng', (req, res) => {
               { limit:40  , fields: "pts.loc" }, (err, items) => {
                 if(items.length > 0) {
                   data["error"]   =   0;
-                  data["Images"]  =   items;
+                  data["Points"]  =   items;
                   res.json(data);
                 }
                 else {
                   data["error"]   =   1;
-                  data["Images"]  =   "No Images Found";
+                  data["message"]  =   "No Points Found";
                   res.json(data);
                 }
               });
@@ -61,12 +61,12 @@ router.get('/incidence/:angle', (req, res) => {
               { limit:40  , fields: "pts.loc" }, (err, items) => {
                 if(items.length > 0) {
                   data["error"]   =   0;
-                  data["Images"]  =   items;
+                  data["Points"]  =   items;
                   res.json(data);
                 }
                 else {
                   data["error"]   =   1;
-                  data["Images"]  =   "No Images Found";
+                  data["message"]  =   "No Images Found";
                   res.json(data);
                 }
               });
@@ -80,7 +80,8 @@ router.get('/image/:id/:in', (req, res) => {
   images.find({_id: req.params.id }, { fields: " pts.ref1 pts.ref2 " }, (err, items) => {
     if(items.length > 0) {
       data["error"]   =   0;
-      data["Image"]  =   items[0].pts[req.params.in];
+      data["ref1"]  =   items[0].pts[req.params.in].ref1;
+      data["ref2"]  =   items[0].pts[req.params.in].ref2;
       res.json(data);
     }
 
@@ -90,13 +91,14 @@ router.get('/image/:id/:in', (req, res) => {
       angle.find({_id: req.params.id }, { fields: " pts.ref1 pts.ref2 " }, (err, items) => {
         if(items.length > 0) {
           data["error"]   =   0;
-          data["Image"]  =   items[0].pts[req.params.in];
+          data["ref1"]  =   items[0].pts[req.params.in.ref1];
+          data["ref2"]  =   items[0].pts[req.params.in.ref2];
           res.json(data);
         }
         else {
           // ...Or else does not exist
           data["error"]   =   1;
-          data["Images"]  =   "No Image Found";
+          data["message"]  =   "No Image Found";
           res.json(data);
         }
       });
