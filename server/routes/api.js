@@ -14,7 +14,7 @@ router.get('/points', (req, res) => {
   let images  =   db.get(IMAGES);
 
 
-  images.find({}, { limit:80  , fields: "pts.loc" }, (err, items) => {
+  images.find({}, { limit:100  , fields: "pts.loc" }, (err, items) => {
     if(items.length > 0) {
       data["error"]   =   0;
       data["Points"]  =   items;
