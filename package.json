@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha",
-    "start": "node server.js"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -38,6 +38,7 @@
     "gulp-uglify": "^2.1.2",
     "main-bower-files": "^2.13.1",
     "mocha": "^3.2.0",
+    "supertest": "^3.0.0",
     "uglify-js": "^2.8.21",
     "vinyl-paths": "^2.1.0"
   }

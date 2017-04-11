@@ -1,33 +1,47 @@
 "use strict";
 
-const expect = require('chai').expect;
+const request = require('supertest');
+let app = require('../server');
 
-describe('Math', () => {
-    describe('#abs()', () => {
-        it('should return positive value of given negative number', () => {
-            expect(Math.abs(-5)).to.be.equal(5);
+describe('API', () => {
+    describe('Integration Tests', () => {
+        describe('GET /api/points/', () => {
+            it('should use charset UTF-8', (done) => {
+                request(app)
+                    .get('/api/points')
+                    .set('Accept-Charset', 'utf-8')
+                    .expect('Content-Type', /charset\=(utf|UTF)\-8/)
+                    .expect(200, done);
+            });
+
+            it('should return application/json', (done) => {
+                request(app)
+                    .get('/api/points')
+                    .set('Accept', 'application/json')
+                    .expect('Content-Type', /application\/json/)
+                    .expect(200, done);
+            });
         });
 
-        it('should return positive value of given positive number', () => {
-            expect(Math.abs(3)).to.be.equal(3);
-        });
+        describe('GET /api/image/:id/:in', () => {
+            const id = "58c6923bff2dcd3dd1239367";
+            const index = 0;
 
-        it('should return 0 given 0', () => {
-            expect(Math.abs(0)).to.be.equal(0);
-        });
-    });
+            it('should use charset UTF-8', (done) => {
+                request(app)
+                    .get(`/api/image/${id}/${index}`)
+                    .set('Accept-Charset', 'utf-8')
+                    .expect('Content-Type', /charset\=(utf|UTF)\-8/)
+                    .expect(200, done);
+            });
 
-    describe('#sqrt()', () => {
-        it('should return the square root of a given positive number', () => {
-            expect(Math.sqrt(25)).to.be.equal(5);
-        });
-
-        it('should return NaN for a given negative number', () => {
-            expect(Math.sqrt(-9)).to.be.NaN;
-        });
-
-        it('should return 0 given 0', () => {
-            expect(Math.sqrt(0)).to.be.equal(0);
+            it('should return application/json', (done) => {
+                request(app)
+                    .get(`/api/image/${id}/${index}`)
+                    .set('Accept', 'application/json')
+                    .expect('Content-Type', /application\/json/)
+                    .expect(200, done);
+            });
         });
     });
 });
