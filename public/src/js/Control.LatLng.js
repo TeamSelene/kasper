@@ -64,7 +64,7 @@ L.Control.LatLng = L.Control.extend({
 
 	_updateMap: function () {
 		if (this._map) {
-			this._map.panTo(this.getValue())
+			this._map.panTo([this.getValue()[0],this.getValue()[1]]);
 		}
 	},
 	_zoomMap: function () {
