@@ -58,7 +58,7 @@ router.get('/incidence/:angle', (req, res) => {
   let lng = 2.49;
 
   angles.find({"loc" : {$near:{$geometry:{"type": "Point", "coordinates" : [ lat, lng ] }}}},
-              { limit:40  , fields: "pts.loc" }, (err, items) => {
+              { limit:40  , fields: "pts.meta.CENTER_LONGITUDE pts.meta.CENTER_LATITUDE" }, (err, items) => {
                 if(items.length > 0) {
                   data["error"]   =   0;
                   data["Points"]  =   items;
@@ -70,6 +70,26 @@ router.get('/incidence/:angle', (req, res) => {
                   res.json(data);
                 }
               });
+});
+
+router.get('/query/:qry', (req, res) => {
+  let data    =   {};
+  let images  =   db.get(IMAGES);
+
+  let qry = JSON.parse(req.params.qry);
+
+    images.find(qry, { limit:40  , fields: "pts.loc" }, (err, items) => {
+      if(items.length > 0) {
+        data["error"]   =   0;
+        data["Points"]  =   items;
+        res.json(data);
+      }
+      else {
+        data["error"]   =   1;
+        data["message"]  =   "No Points Found";
+        res.json(data);
+      }
+    });
 });
 
 router.get('/image/:id/:in', (req, res) => {

@@ -42,6 +42,10 @@ $(window).on("load", () => {
         maxZoom: 12
     });
 
+    // let wmsLayer = L.tileLayer.wms('http://localhost:8080/geoserver/topp/wms', {
+    //  layers: 'states'
+    //  }).addTo(map);
+
     let wmsLayer = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
         layers: 'LOLA_color'
     }).addTo(map);
@@ -98,7 +102,8 @@ $(window).on("load", () => {
     function onEachFeature(point, layer) {
         layer.on('click', (e) => {
             let loc = L.latLng(point.coordinates[1], point.coordinates[0]);
-            map.setZoomAround(loc,6);
+            let curZoom = map.getZoom();
+            if(curZoom < 6) map.setZoomAround(loc,6);
             map.panTo(loc);
             console.log(map.center);
 
@@ -119,11 +124,13 @@ $(window).on("load", () => {
     }
 
     let urlQuery = getParameterByName('query');
-
+    // We have a query parameter
     if (urlQuery) {
       console.log(urlQuery);
       let getstr = 'api/';
       let split = urlQuery.split(" ");
+      console.log(split[0]);
+      // CASE: near query
       if (split[0].toLowerCase() === "near" && split.length == 3) {
           let lat = parseFloat(split[1]);
           let lng = parseFloat(split[2]);
@@ -131,16 +138,30 @@ $(window).on("load", () => {
           getstr += `near/${lat}/${lng}`;
           map.panTo([lng, lat]);
       }
-      else if (split[0].toLowerCase() === "incidence" && split.length == 2) {
+      // CASE: raw query
+      else if (split.length === 1) {
+        let qry = split[0];
+        console.log(qry);
+        getstr +=`query/${qry}`;
+      }
+      // call plot points on data returned from images collection
+      $.getJSON(getstr, (data) => {
+          console.log(data);
+          plotPoints(geoJSONLayer, data.Points)
+      });
+      // CASE: incidence query
+      if (split[0].toLowerCase() === "incidence" && split.length == 2) {
           let ang = parseFloat(split[1]);
           getstr += `incidence/${ang}`;
-
+          // Use different plot method for angles collection data
+          $.getJSON(getstr, (data) => {
+              console.log(data);
+              plotAngularPoints(geoJSONLayer, data.Points)
+          });
         }
-        $.getJSON(getstr, (data) => {
-            console.log(data);
-            plotPoints(geoJSONLayer, data.Points)
-        });
+
     }
+    // CASE: no query, get Default points
     else {
         $.getJSON('api/points', (data) => {
             plotPoints(geoJSONLayer, data.Points)
@@ -155,6 +176,7 @@ function updateQuery(query) {
 function plotPoints(geoJSONLayer, data) {
     // Grab the points of every element.
     let geoDataPoints = data.map(image =>
+          // for each point in pts array of each image
             image.pts.map((point, i) =>
                 ({
                     eid: image._id,
@@ -166,6 +188,21 @@ function plotPoints(geoJSONLayer, data) {
         )
         .reduce((a, b) => a.concat(b), []);
     geoJSONLayer.addData(geoDataPoints);
+}
+// plot
+function plotAngularPoints(geoJSONLayer, data) {
+  let geoDataPoints = data.map(image =>
+          image.pts.map((point, i) =>
+              ({
+                  eid: image._id,
+                  index: i,
+                  type: "Point",
+                  coordinates: [point.meta.CENTER_LONGITUDE - 180, point.meta.CENTER_LATITUDE],
+              })
+          )
+      )
+      .reduce((a, b) => a.concat(b), []);
+  geoJSONLayer.addData(geoDataPoints);
 }
 
 function createRefData(point) {
