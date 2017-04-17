@@ -30,9 +30,9 @@ router.get('/points', (req, res) => {
 
 router.get('/newImage', (req, res) => {
     let spawn = require('child_process').spawn,
-      py      = spawn('python2', ['create_layer.py']),
-      data    = {};
-
+    py      = spawn('python', ['create_layer.py']),
+    data    = {};
+    console.log(py);
     py.stdout.on('data', (item) => {
       if(item) {
       data["error"]   = 0;
