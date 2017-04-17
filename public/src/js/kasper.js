@@ -42,13 +42,9 @@ $(window).on("load", () => {
         maxZoom: 12
     });
 
-    let wmsLayer = L.tileLayer.wms('http://localhost:8080/geoserver/topp/wms', {
-     layers: '44d570221e39dea1239381cf671e3202e5d73942d2f45b2a9ac45e25'
-     }).addTo(map);
-
-    // let wmsLayer = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
-    //     layers: 'LOLA_color'
-    // }).addTo(map);
+    let LOLA_color = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
+        layers: 'LOLA_color'
+    }).addTo(map);
 
     let LOLA_Steel = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
         layers: 'LOLA_steel'
@@ -75,7 +71,7 @@ $(window).on("load", () => {
     });
 
     let baseLayers = {
-        'USGS_Map Default (LOLA_Color)': wmsLayer,
+        'USGS_Map Default (LOLA_Color)': LOLA_color,
         'USGS_Map LOLA_Steel': LOLA_Steel,
         'USGS_Map LOLA_BW': LOLA_BW,
         'USGS_Map LROC_WAC': LROC_WAC,
@@ -83,7 +79,7 @@ $(window).on("load", () => {
         'USGS_Map LO': LO,
         'USGS_Map UV_LO': UV_LO
     };
-
+    
     L.control.layers(baseLayers).addTo(map);
 
     let geoJSONLayer = L.geoJSON(null, {
