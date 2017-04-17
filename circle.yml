@@ -1,7 +1,7 @@
 machine:
     timezone: America/Phoenix
     node:
-        version: 6.10
+        version: 6
 database:
     override:
         - mongoimport --db selene --collection images --drop test/db.test.json
