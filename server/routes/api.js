@@ -28,6 +28,28 @@ router.get('/points', (req, res) => {
   });
 });
 
+router.get('/newImage', (req, res) => {
+    let spawn = require('child_process').spawn,
+      py      = spawn('python2', ['create_layer.py']),
+      data    = {};
+
+    py.stdout.on('data', (item) => {
+      if(item) {
+      data["error"]   = 0;
+      data["layer"]   = data;
+      console.log(data);
+      }
+      else {
+        data["error"]   =   1;
+        data["message"]  =   "No Points Found";
+      }
+    });
+
+    py.stdout.on('end', () => {
+      res.json(data);
+    });
+});
+
 router.get('/near/:lat/:lng', (req, res) => {
   let data    =   {};
   let images  =   db.get(IMAGES);
