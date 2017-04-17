@@ -36,7 +36,7 @@ router.get('/newImage', (req, res) => {
     py.stdout.on('data', (item) => {
       if(item) {
       data["error"]   = 0;
-      data["layer"]   = item;
+      data["layer"]   = item.toString('utf8', 0, item.length - 1);
       console.log(data);
       }
       else {

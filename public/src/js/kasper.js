@@ -159,7 +159,7 @@ $(window).on("load", () => {
               plotAngularPoints(geoJSONLayer, data.Points)
           });
         }
-        else if (split[0] == "layer" && split.length == 1) {
+        else if (split[0] == "layer" && split.length == 2) {
           getstr += `newImage`;
           $.getJSON(getstr, (data) => {
             console.log(data);
