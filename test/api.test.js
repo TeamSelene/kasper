@@ -38,7 +38,7 @@ describe('API', () => {
         });
 
         describe('GET /api/image/:id/:in', () => {
-            const id = "58c6923bff2dcd3dd1239367";
+            const id = "58da235eff2dcd035160cda8";
             const index = 0;
 
             it('should use charset UTF-8', (done) => {
