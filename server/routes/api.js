@@ -133,8 +133,8 @@ router.get('/image/:id/:in', (req, res) => {
       angle.find({_id: req.params.id }, { fields: " pts.ref1 pts.ref2 " }, (err, items) => {
         if(items.length > 0) {
           data["error"]   =   0;
-          data["ref1"]  =   items[0].pts[req.params.in.ref1];
-          data["ref2"]  =   items[0].pts[req.params.in.ref2];
+          data["ref1"]  =   items[0].pts[req.params.in].ref1;
+          data["ref2"]  =   items[0].pts[req.params.in].ref2;
           res.json(data);
         }
         else {
