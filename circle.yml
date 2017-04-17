@@ -5,3 +5,4 @@ machine:
 database:
     override:
         - mongoimport --db selene --collection images --drop test/db.images.test.json
+        - mongoimport --db selene --collection image_angles --drop test/db.image_angles.test.json

@@ -18,6 +18,22 @@ describe('API', () => {
             });
         });
 
+        describe('GET /api/image/:id/:in', () => {
+            const id = "58da235eff2dcd035160cda8";
+            const index = 0;
+            const octets = 2903;
+
+            it(`should be ${octets} octets big`, (done) => {
+                request(app)
+                    .get(`/api/image/${id}/${index}`)
+                    .set('Accept-Charset', 'utf-8')
+                    .set('Accept', 'application/json')
+                    .expect('Content-Length', octets.toString(10))
+                    .expect(200, done);
+            })
+        })
+    });
+
     describe('Integration Tests', () => {
         describe('GET /api/points/', () => {
             it('should use charset UTF-8', (done) => {
