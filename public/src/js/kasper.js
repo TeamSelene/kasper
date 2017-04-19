@@ -42,11 +42,7 @@ $(window).on("load", () => {
         maxZoom: 12
     });
 
-    // let wmsLayer = L.tileLayer.wms('http://localhost:8080/geoserver/topp/wms', {
-    //  layers: 'states'
-    //  }).addTo(map);
-
-    let wmsLayer = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
+    let LOLA_color = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
         layers: 'LOLA_color'
     }).addTo(map);
 
@@ -75,7 +71,7 @@ $(window).on("load", () => {
     });
 
     let baseLayers = {
-        'USGS_Map Default (LOLA_Color)': wmsLayer,
+        'USGS_Map Default (LOLA_Color)': LOLA_color,
         'USGS_Map LOLA_Steel': LOLA_Steel,
         'USGS_Map LOLA_BW': LOLA_BW,
         'USGS_Map LROC_WAC': LROC_WAC,
@@ -83,7 +79,7 @@ $(window).on("load", () => {
         'USGS_Map LO': LO,
         'USGS_Map UV_LO': UV_LO
     };
-
+    
     L.control.layers(baseLayers).addTo(map);
 
     let geoJSONLayer = L.geoJSON(null, {
@@ -144,13 +140,17 @@ $(window).on("load", () => {
         console.log(qry);
         getstr +=`query/${qry}`;
       }
+
       // call plot points on data returned from images collection
-      $.getJSON(getstr, (data) => {
-          console.log(data);
-          plotPoints(geoJSONLayer, data.Points)
-      });
+      if (getstr != "api/"){
+        $.getJSON(getstr, (data) => {
+            console.log(data);
+            plotPoints(geoJSONLayer, data.Points)
+        });
+      }
+
       // CASE: incidence query
-      if (split[0].toLowerCase() === "incidence" && split.length == 2) {
+      else if (split[0].toLowerCase() === "incidence" && split.length == 2) {
           let ang = parseFloat(split[1]);
           getstr += `incidence/${ang}`;
           // Use different plot method for angles collection data
@@ -158,6 +158,17 @@ $(window).on("load", () => {
               console.log(data);
               plotAngularPoints(geoJSONLayer, data.Points)
           });
+        }
+        else if (split[0] == "layer" && split.length == 2) {
+          getstr += `newImage`;
+          $.getJSON(getstr, (data) => {
+            console.log(data);
+            if (data.error == 0){
+              wmsLayer = L.tileLayer.wms('http://localhost:8080/geoserver/selene/wms', {
+               layers: data.layer
+                }).addTo(map);
+            }
+          })
         }
 
     }
