@@ -4,10 +4,11 @@ const DB          =   "selene"
 const IMAGES      =   "images"
 const ANGLES      =   "image_angles"
 
-const express =   require("express");
-const router  =   express.Router();
-const monk    =   require("monk");
-const db      =   monk(`${URL}:${PORT}/${DB}`);
+const express     =   require("express");
+const router      =   express.Router();
+const monk        =   require("monk");
+const PythonShell =   require('python-shell');
+const db          =   monk(`${URL}:${PORT}/${DB}`);
 
 router.get('/points', (req, res) => {
   let data    =   {};
@@ -28,16 +29,28 @@ router.get('/points', (req, res) => {
   });
 });
 
-router.get('/newImage', (req, res) => {
-    let spawn = require('child_process').spawn,
-    py      = spawn('python', ['create_layer.py']),
-    data    = {};
-    console.log(py);
-    py.stdout.on('data', (item) => {
+router.get('/newImage/:qry?', (req, res) => {
+    let pyshell = new PythonShell('new_layer.py'),
+    data        = {},
+    qry         = req.params.qry;
+
+    let type  = 0;
+    let query = {};
+
+    if(qry) {
+      type = 1;
+      query = qry;
+    }
+    pyshell.send(type.toString());
+    pyshell.send(JSON.stringify(qry));
+
+    console.log(pyshell);
+    console.log(query);
+    pyshell.on('message', (item) => {
       if(item) {
       data["error"]   = 0;
       data["layer"]   = item.toString('utf8', 0, item.length - 1);
-      console.log(data);
+      console.log(item);
       }
       else {
         data["error"]   =   1;
@@ -45,7 +58,11 @@ router.get('/newImage', (req, res) => {
       }
     });
 
-    py.stdout.on('end', () => {
+    pyshell.end((err) => {
+      if(err){
+        throw(err);
+      }
+
       res.json(data);
     });
 });
