@@ -9,7 +9,7 @@ database:
         - mongoimport --db selene --collection images --drop test/db/db.images.test.json
         - mongoimport --db selene --collection image_angles --drop test/db/db.image_angles.test.json
 
-install:
+dependencies:
     pre:
       - wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
       - bash miniconda.sh -b -p $HOME/miniconda
