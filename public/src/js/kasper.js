@@ -37,6 +37,7 @@ let map = L.map('map', {
     minZoom: 1,
     maxZoom: 12
 });
+let wmsLayer = null;
 
 $(window).on("load", () => {
     let popup = null;
@@ -45,7 +46,7 @@ $(window).on("load", () => {
 
     let LOLA_color = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
         layers: 'LOLA_color'
-    }).addTo(map);
+    })
 
     let LOLA_Steel = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
         layers: 'LOLA_steel'
@@ -61,7 +62,7 @@ $(window).on("load", () => {
 
     var KaguyaTC_Ortho = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
         layers: 'KaguyaTC_Ortho'
-    });
+    }).addTo(map);
 
     var LO = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
         layers: 'LO'
@@ -75,6 +76,8 @@ $(window).on("load", () => {
     //  transparent: true,
     //   }).addTo(map);
 
+
+
     let baseLayers = {
         'USGS_Map Default (LOLA_Color)': LOLA_color,
         'USGS_Map LOLA_Steel': LOLA_Steel,
@@ -84,6 +87,7 @@ $(window).on("load", () => {
         'USGS_Map LO': LO,
         'USGS_Map UV_LO': UV_LO
     };
+
 
     L.control.layers(baseLayers).addTo(map);
 
@@ -116,14 +120,6 @@ $(window).on("load", () => {
         });
     }
 
-    function makeQuery(query) {
-        console.log("succ");
-        let split = query.split(" ");
-        if (split[0].toLowerCase() === "near" && split.length == 3) {
-            console.log("succ");
-        }
-    }
-
     let urlQuery = getParameterByName('query');
     // We have a query parameter
     if(urlQuery){
@@ -133,6 +129,12 @@ $(window).on("load", () => {
         $.getJSON('api/points', (data) => {
             plotPoints(geoJSONLayer, data.Points)
         });
+    }
+});
+
+map.on('baselayerchange', (e) => {
+    if (wmsLayer){
+      wmsLayer.bringToFront();
     }
 });
 
@@ -192,12 +194,13 @@ function updateQuery(urlQuery, geoJSONLayer) {
         $.getJSON(getstr, (data) => {
           console.log(data);
           if (data.error == 0){
-            let wmsLayer = L.tileLayer.wms('http://localhost:8080/geoserver/selene/wms', {
+            wmsLayer = L.tileLayer.wms('http://localhost:8080/geoserver/selene/wms', {
              layers: data.layer,
              format: 'image/png',
              transparent: true,
              styles: 'bluered'
               }).addTo(map);
+              wmsLayer.bringToFront();
           }
         });
       }
