@@ -194,6 +194,7 @@ function updateQuery(urlQuery, geoJSONLayer) {
           if (data.error == 0){
             let wmsLayer = L.tileLayer.wms('http://localhost:8080/geoserver/selene/wms', {
              layers: data.layer,
+             format: 'image/png',
              transparent: true,
              styles: 'bluered'
               }).addTo(map);
