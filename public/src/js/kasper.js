@@ -30,17 +30,18 @@ const wavelengths = [512.6, 518.4, 524.7, 530.4, 536.5, 542.8, 548.7, 554.5,
     2579.9, 2587.9
 ];
 
+let map = L.map('map', {
+    crs: L.CRS.EPSG4326,
+    center: [0, 0],
+    zoom: 1,
+    minZoom: 1,
+    maxZoom: 12
+});
+
 $(window).on("load", () => {
     let popup = null;
     let refGraph = null;
 
-    let map = L.map('map', {
-        crs: L.CRS.EPSG4326,
-        center: [0, 0],
-        zoom: 1,
-        minZoom: 1,
-        maxZoom: 12
-    });
 
     let LOLA_color = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
         layers: 'LOLA_color'
@@ -69,6 +70,10 @@ $(window).on("load", () => {
     let UV_LO = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
         layers: 'uv_lo'
     });
+    // let wmsLayer = L.tileLayer.wms('http://localhost:8080/geoserver/selene/wms', {
+    //  layers: '44d570221e39dea1239381cf671e3202e5d73942d2f45b2a9ac45e25',
+    //  transparent: true,
+    //   }).addTo(map);
 
     let baseLayers = {
         'USGS_Map Default (LOLA_Color)': LOLA_color,
@@ -79,7 +84,7 @@ $(window).on("load", () => {
         'USGS_Map LO': LO,
         'USGS_Map UV_LO': UV_LO
     };
-    
+
     L.control.layers(baseLayers).addTo(map);
 
     let geoJSONLayer = L.geoJSON(null, {
@@ -121,58 +126,9 @@ $(window).on("load", () => {
 
     let urlQuery = getParameterByName('query');
     // We have a query parameter
-    if (urlQuery) {
-      console.log(urlQuery);
-      let getstr = 'api/';
-      let split = urlQuery.split(" ");
-      console.log(split[0]);
-      // CASE: near query
-      if (split[0].toLowerCase() === "near" && split.length == 3) {
-          let lat = parseFloat(split[1]);
-          let lng = parseFloat(split[2]);
-          console.log(lat);
-          getstr += `near/${lat}/${lng}`;
-          map.panTo([lng, lat]);
-      }
-      // CASE: raw query
-      else if (split.length === 1) {
-        let qry = split[0];
-        console.log(qry);
-        getstr +=`query/${qry}`;
-      }
-
-      // call plot points on data returned from images collection
-      if (getstr != "api/"){
-        $.getJSON(getstr, (data) => {
-            console.log(data);
-            plotPoints(geoJSONLayer, data.Points)
-        });
-      }
-
-      // CASE: incidence query
-      else if (split[0].toLowerCase() === "incidence" && split.length == 2) {
-          let ang = parseFloat(split[1]);
-          getstr += `incidence/${ang}`;
-          // Use different plot method for angles collection data
-          $.getJSON(getstr, (data) => {
-              console.log(data);
-              plotAngularPoints(geoJSONLayer, data.Points)
-          });
-        }
-        else if (split[0] == "layer" && split.length == 2) {
-          getstr += `newImage`;
-          $.getJSON(getstr, (data) => {
-            console.log(data);
-            if (data.error == 0){
-              wmsLayer = L.tileLayer.wms('http://localhost:8080/geoserver/selene/wms', {
-               layers: data.layer
-                }).addTo(map);
-            }
-          })
-        }
-
+    if(urlQuery){
+      updateQuery(urlQuery, geoJSONLayer);
     }
-    // CASE: no query, get Default points
     else {
         $.getJSON('api/points', (data) => {
             plotPoints(geoJSONLayer, data.Points)
@@ -180,9 +136,76 @@ $(window).on("load", () => {
     }
 });
 
-function updateQuery(query) {
+function updateQuery(urlQuery, geoJSONLayer) {
+    console.log(urlQuery);
+    //Base api url
+    let getstr = 'api/';
+    //Split on space
+    let split = urlQuery.split(" ");
+    console.log(split[0]);
 
-}
+    // CASE: near query
+    if (split[0].toLowerCase() === "near" && split.length == 3) {
+        let lat = parseFloat(split[1]);
+        let lng = parseFloat(split[2]);
+        console.log(lat);
+        getstr += `near/${lat}/${lng}`;
+        map.panTo([lng, lat]);
+    }
+
+    // CASE: raw query
+    else if (split[0].toLowerCase() == "query" && split.length === 2) {
+      let qry = split[0];
+      console.log(qry);
+      getstr +=`query/${qry}`;
+    }
+
+    // call plot points on data returned from images collection
+    if (getstr != "api/"){
+      $.getJSON(getstr, (data) => {
+          console.log(data);
+          plotPoints(geoJSONLayer, data.Points)
+      });
+    }
+
+    // CASE: incidence query
+    else if (split[0].toLowerCase() === "incidence" && split.length == 2) {
+        let ang = parseFloat(split[1]);
+        getstr += `incidence/${ang}`;
+        // Use different plot method for angles collection data
+        $.getJSON(getstr, (data) => {
+            console.log(data);
+            plotAngularPoints(geoJSONLayer, data.Points)
+        });
+    }
+
+    // CASE: layer request
+    else if (split[0].toLowerCase() == "layer") {
+      getstr += `newImage/`;
+      if (split.length > 2){}
+      else{
+        if ( split.length == 1 ){}
+        else {
+          let qry = split[1];
+          getstr += `${qry}`;
+        }
+        $.getJSON(getstr, (data) => {
+          console.log(data);
+          if (data.error == 0){
+            let wmsLayer = L.tileLayer.wms('http://localhost:8080/geoserver/selene/wms', {
+             layers: data.layer,
+             transparent: true,
+             styles: 'bluered'
+              }).addTo(map);
+          }
+        });
+      }
+      $.getJSON('api/points', (data) => {
+          plotPoints(geoJSONLayer, data.Points)
+      });
+    }
+
+  }
 
 function plotPoints(geoJSONLayer, data) {
     // Grab the points of every element.
