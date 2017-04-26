@@ -11,6 +11,7 @@ import numpy as np
 import pymongo
 import pandas as pd
 import json
+from bson.json_util import dumps
 
 import gdal, osr
 
@@ -52,6 +53,7 @@ class SpectralProfiler(object):
 
     def __init__(self, host, port=27017, user=None, password=None):
         self.host = host
+        
         self.port = port
         self.user = user
 
@@ -71,19 +73,23 @@ class SpectralProfiler(object):
             projection["loc"] = True
 
         results = self.db[collection].find(query, projection, *args, **kwargs)
-        result_list = list(results)
+        print results.count()
+        if results.count() <= 150:
+            return dumps(results)
+        else:
+            result_list = list(results)
 
-        points = []
-        for i in range(len(result_list)):
-            data_dict = result_list[i]
-            data_list = [data_dict['loc']['coordinates'][0], data_dict['loc']['coordinates'][1]]
-            data_list.extend(list(np.frombuffer(data_dict[field], dtype='f4')))
-            points.append(data_list)
+            points = []
+            for i in range(len(result_list)):
+                data_dict = result_list[i]
+                data_list = [data_dict['loc']['coordinates'][0], data_dict['loc']['coordinates'][1]]
+                data_list.extend(list(np.frombuffer(data_dict[field], dtype='f4')))
+                points.append(data_list)
 
-        refs = np.asarray(points)
-        header = np.asarray(['long', 'lat'] + wavelengths)
-        self.dataframe = pd.DataFrame(data=refs, columns=header)
-        return self.dataframe
+            refs = np.asarray(points)
+            header = np.asarray(['long', 'lat'] + wavelengths)
+            self.dataframe = pd.DataFrame(data=refs, columns=header)
+            return self.dataframe
 
 
     def compute_image(self, w, h, map_scheme='bone', wavelength='770.7', bg='#777777'):

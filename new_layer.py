@@ -22,31 +22,37 @@ def create_hash(query, projection):
 
 read_in = sys.stdin.readline()
 type    = int(read_in[0])
+# query   =  {"loc":{"$geoWithin":{"$box":[[ 150, 0 ],[160, 6]]}}}
 query   = {}
 if type == 1:
-    query = json.loads(read_in[1])
-# Create Connection
-conn = SpectralProfiler("localhost", 27017)
+        query = json.loads(read_in[1])
+
 # connect to the catalog
 cat = Catalog("http://localhost:8080/geoserver/rest/")
 
 # Create some Queries with a projection
-query, projection = {}, {"loc" : True, "ref2": True}
+projection = {"loc" : True, "ref2": True }
 layer_name = create_hash(query, projection)
 
 found = cat.get_layer(layer_name)
-print found
 if found:
     print(layer_name)
     sys.exit(0)
 else:
     # Generate a dataframe from the query
+    # Create Connection
+    conn = SpectralProfiler("localhost", 27017)
     data = conn.compute_dataframe(query, projection, field = "ref2")
 
+    # Try to load json - if it fails continue to generate image
+    try:
+        dl = json.loads(data)
+        print(dl)
+        sys.exit(0)
+    except TypeError:
+        pass
     img = conn.compute_image(600, 300, "bone", bg=None)
     conn.save_image("test.tif")
-
-
 
     workspace = cat.get_workspace("selene")
 

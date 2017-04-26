@@ -37,7 +37,9 @@ let map = L.map('map', {
     minZoom: 1,
     maxZoom: 12
 });
+
 let wmsLayer = null;
+let geoJSONLayer = null;
 
 $(window).on("load", () => {
     let popup = null;
@@ -71,11 +73,6 @@ $(window).on("load", () => {
     let UV_LO = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
         layers: 'uv_lo'
     });
-    // let wmsLayer = L.tileLayer.wms('http://localhost:8080/geoserver/selene/wms', {
-    //  layers: '44d570221e39dea1239381cf671e3202e5d73942d2f45b2a9ac45e25',
-    //  transparent: true,
-    //   }).addTo(map);
-
 
 
     let baseLayers = {
@@ -91,7 +88,12 @@ $(window).on("load", () => {
 
     L.control.layers(baseLayers).addTo(map);
 
-    let geoJSONLayer = L.geoJSON(null, {
+    // wmsLayer = L.tileLayer.wms('http://localhost:8080/geoserver/selene/wms', {
+    //  layers: '56d64f9a7a0066f09b0b5c42b31f3a3e936a3b0351e88393f39d118e',
+    //  transparent: true,
+    //   }).addTo(map);
+
+    geoJSONLayer = L.geoJSON(null, {
         onEachFeature: onEachFeature,
         pointToLayer: function(point, latlng) {
           let dotIcon = new L.DivIcon({
@@ -138,6 +140,40 @@ map.on('baselayerchange', (e) => {
     }
 });
 
+map.on('click', (e) => {
+
+  var loc = L.latLng(e.latlng.lat, e.latlng.lng);
+  let curZoom = map.getZoom();
+  if(curZoom < 6) map.setZoomAround(loc,6);
+  map.panTo(loc);
+
+  let bounds = map.getBounds();
+  let sw = bounds.getSouthWest();
+  let ne = bounds.getNorthEast()
+  console.log(bounds);
+
+  let query   = {"loc":{"$geoWithin":{"$box":[[sw.lat,sw.lng],[ne.lat,ne.lng]]}}};
+  let qry     = JSON.stringify(query);
+  let getstr  = `api/query/${qry}`;
+  console.log(getstr);
+  $.getJSON(getstr, (data) => {
+    console.log(data);
+    geoJSONLayer = null;
+    geoJSONLayer = L.geoJSON(null, {
+        onEachFeature: onEachFeature,
+        pointToLayer: function(point, latlng) {
+          let dotIcon = new L.DivIcon({
+            iconSize:     [7, 10],
+            className: 'leaflet-svg-icon',
+            html: `<svg width="7" height="10"><rect width="7" height="10" style="fill:rgb(255,0,0);stroke-width:1;stroke:rgb(0,0,50);" /></svg>`
+          });
+          return L.marker(latlng, {icon: dotIcon});
+        },
+    }).addTo(map);
+    plotPoints(geoJSONLayer, data.Points);
+  });
+});
+
 function updateQuery(urlQuery, geoJSONLayer) {
     console.log(urlQuery);
     //Base api url
@@ -157,7 +193,7 @@ function updateQuery(urlQuery, geoJSONLayer) {
 
     // CASE: raw query
     else if (split[0].toLowerCase() == "query" && split.length === 2) {
-      let qry = split[0];
+      let qry = split[1];
       console.log(qry);
       getstr +=`query/${qry}`;
     }
@@ -166,7 +202,7 @@ function updateQuery(urlQuery, geoJSONLayer) {
     if (getstr != "api/"){
       $.getJSON(getstr, (data) => {
           console.log(data);
-          plotPoints(geoJSONLayer, data.Points)
+          plotPoints(geoJSONLayer, data.Points);
       });
     }
 
@@ -177,7 +213,7 @@ function updateQuery(urlQuery, geoJSONLayer) {
         // Use different plot method for angles collection data
         $.getJSON(getstr, (data) => {
             console.log(data);
-            plotAngularPoints(geoJSONLayer, data.Points)
+            plotAngularPoints(geoJSONLayer, data.Points);
         });
     }
 
@@ -205,7 +241,7 @@ function updateQuery(urlQuery, geoJSONLayer) {
         });
       }
       $.getJSON('api/points', (data) => {
-          plotPoints(geoJSONLayer, data.Points)
+          plotPoints(geoJSONLayer, data.Points);
       });
     }
 

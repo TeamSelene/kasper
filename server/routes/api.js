@@ -30,6 +30,7 @@ router.get('/points', (req, res) => {
 });
 
 router.get('/newImage/:qry?', (req, res) => {
+    // set variables
     let pyshell = new PythonShell('new_layer.py'),
     data        = {},
     qry         = req.params.qry;
@@ -39,14 +40,14 @@ router.get('/newImage/:qry?', (req, res) => {
 
     if(qry) {
       type = 1;
-      query = qry;
+      query = JSON.parse(qry);
     }
     pyshell.send(type.toString());
-    pyshell.send(JSON.stringify(qry));
+    pyshell.send(JSON.stringify(query));
 
-    console.log(pyshell);
     console.log(query);
     pyshell.on('message', (item) => {
+      console.log(item)
       if(item) {
       data["error"]   = 0;
       data["layer"]   = item.toString('utf8', 0, item.length - 1);
@@ -116,8 +117,12 @@ router.get('/query/:qry', (req, res) => {
   let images  =   db.get(IMAGES);
 
   let qry = JSON.parse(req.params.qry);
+  console.log(qry);
 
     images.find(qry, { limit:40  , fields: "pts.loc" }, (err, items) => {
+      if(err){
+        console.log(err);
+      }
       if(items.length > 0) {
         data["error"]   =   0;
         data["Points"]  =   items;
