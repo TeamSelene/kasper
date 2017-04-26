@@ -2,7 +2,40 @@ machine:
     timezone: America/Phoenix
     node:
         version: 6
+
+    python:
+        version: 2.7.10
+
 database:
     override:
         - mongoimport --db selene --collection images --drop test/db/db.images.test.json
         - mongoimport --db selene --collection image_angles --drop test/db/db.image_angles.test.json
+
+
+dependencies:
+    pre:
+      - wget https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+      - bash miniconda.sh -b -p $HOME/miniconda
+      - export PATH="$HOME/miniconda/bin:$PATH"
+      - hash -r
+      - conda config --set always_yes yes --set changeps1 no
+      - conda update -q conda
+      # Useful for debugging any issues with conda
+      - conda info -a
+
+      # Install dependencies
+      - conda config --add channels conda-forge
+      - conda config --add channels menpo
+      - conda config --add channels jlaura
+      - conda config --set ssl_verify false
+      - conda install python=$PYTHON_VERSION
+      - conda install -c conda-forge numpy
+      - conda install -c jlaura plio opencv3=3.0.0
+      - conda install -c conda-forge vlfeat
+      - conda install -c menpo cyvlfeat
+      - pip install pillow pysal
+      - conda install scipy networkx numexpr dill cython pyyaml matplotlib pymongo
+
+      # Development installation
+      - conda install pytest pytest-cov coverage sh anaconda-client
+      - pip install coveralls
