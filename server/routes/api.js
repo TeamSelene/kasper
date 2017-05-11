@@ -113,7 +113,7 @@ router.get('/incidence/:angle', (req, res) => {
   let angles  =   db.get(ANGLES);
 
   let lat = parseFloat(req.params.angle);
-  let lng = 2.49;
+  console.log(lat)
 
   angles.find({"loc" : {$geoWithin:{$box:[[lat,0],[lat,90]]}}},
               { limit:40  , fields: "pts.meta.CENTER_LONGITUDE pts.meta.CENTER_LATITUDE" }, (err, items) => {
