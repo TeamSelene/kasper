@@ -249,13 +249,18 @@ function updateQuery(urlQuery, geoJSONLayer) {
       $.getJSON(getstr, (data) => {
         console.log(data);
         if (data.error == 0){
-          wmsLayer = L.tileLayer.wms('http://localhost:8080/geoserver/selene/wms', {
-           layers: data.layer,
-           format: 'image/png',
-           transparent: true,
-           styles: 'bluered'
+          if(data.hasOwnProperty('layer')){
+            wmsLayer = L.tileLayer.wms('http://localhost:8080/geoserver/selene/wms', {
+            layers: data.layer,
+            format: 'image/png',
+            transparent: true,
+            styles: 'bluered'
             }).addTo(map);
             wmsLayer.bringToFront();
+          }
+          else {
+            plotPoints(geoJSONLayer, data.Points);
+          }
         }
       });
     $.getJSON('api/points', (data) => {
