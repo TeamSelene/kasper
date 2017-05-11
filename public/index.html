@@ -17,17 +17,19 @@
 </head>
 
 <body>
-    <div class="toolbar">
-        <form>
-            Query: <input type="text" name="query" id="query" />
-            <input type="submit" value="Submit" onclick="makeQuery(document.getElementById(query).value)" />
-        </form>
-    </div>
-
-    <div id='map' class='map'></div>
-
-    <div id="ref-box" width="800" height="300" style="max-width:800px; max-height: 300px; float: left;">
-        <canvas id="refGraph" width="800" height="300"></canvas>
+    <div id="wrapper" style="text-align: center">
+      <div id="content-block" style="display: inline-block">
+        <div class="toolbar">
+            <form>
+                Query: <textarea type="text" cols="40" rows="3" name="query" id="query"></textarea>
+                <input type="submit" value="Submit" onclick="makeQuery(document.getElementById(query).value)" />
+            </form>
+        </div>
+        <div id='map' class='map'></div>
+        <div id="ref-box" width="800" height="300" style="max-width:800px; max-height: 300px; float: left;">
+            <canvas id="refGraph" width="800" height="300"></canvas>
+        </div>
+      </div>
     </div>
 
     <script src="src/js/jquery.min.js"></script>

@@ -21,11 +21,7 @@ def create_hash(query, projection):
 
 
 read_in = sys.stdin.readline()
-type    = int(read_in[0])
-# query   =  {"loc":{"$geoWithin":{"$box":[[ 150, 0 ],[160, 6]]}}}
-query   = {}
-if type == 1:
-        query = json.loads(read_in[1])
+query = json.loads(read_in)
 
 # connect to the catalog
 cat = Catalog("http://localhost:8080/geoserver/rest/")
@@ -35,6 +31,7 @@ projection = {"loc" : True, "ref2": True }
 layer_name = create_hash(query, projection)
 
 found = cat.get_layer(layer_name)
+
 if found:
     print(layer_name)
     sys.exit(0)
@@ -47,7 +44,7 @@ else:
     # Try to load json - if it fails continue to generate image
     try:
         dl = json.loads(data)
-        print(dl)
+        print(json.dumps(dl))
         sys.exit(0)
     except TypeError:
         pass

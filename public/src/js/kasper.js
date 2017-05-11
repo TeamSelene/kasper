@@ -1,3 +1,12 @@
+/*
+  KASPER: Kaguya Spectral Profiler Explorer
+  This is the front end of the kasper application. This script creates a leaflet
+  map for displaying geospatial data associated with the kaguya sp dataset, as
+  well as a chart.js chart for displaying hyperspectral data. Querries can be
+  made on the kaguya dataset using url queries which are passed through the kasper
+  REST API middleware.
+*/
+
 const wavelengths = [512.6, 518.4, 524.7, 530.4, 536.5, 542.8, 548.7, 554.5,
     560.5, 566.7, 572.6, 578.5, 584.5, 590.6, 596.7, 602.5, 608.6, 614.6,
     620.5, 626.7, 632.7, 638.6, 644.6, 650.6, 656.6, 662.6, 668.8, 674.7,
@@ -30,6 +39,7 @@ const wavelengths = [512.6, 518.4, 524.7, 530.4, 536.5, 542.8, 548.7, 554.5,
     2579.9, 2587.9
 ];
 
+// Create the leaflet map
 let map = L.map('map', {
     crs: L.CRS.EPSG4326,
     center: [0, 0],
@@ -41,10 +51,14 @@ let map = L.map('map', {
 let wmsLayer = null;
 let geoJSONLayer = null;
 
+/*
+  Initialize map settings on window load
+*/
 $(window).on("load", () => {
     let popup = null;
     let refGraph = null;
 
+  // initialize context imagery layers
 
     let LOLA_color = L.tileLayer.wms('https://planetarymaps.usgs.gov/cgi-bin/mapserv?map=/maps/earth/moon_simp_cyl.map', {
         layers: 'LOLA_color'
@@ -74,7 +88,7 @@ $(window).on("load", () => {
         layers: 'uv_lo'
     });
 
-
+    // baselayers initialized
     let baseLayers = {
         'USGS_Map Default (LOLA_Color)': LOLA_color,
         'USGS_Map LOLA_Steel': LOLA_Steel,
@@ -85,14 +99,15 @@ $(window).on("load", () => {
         'USGS_Map UV_LO': UV_LO
     };
 
-
+    // Add layer controll
     L.control.layers(baseLayers).addTo(map);
 
-    // wmsLayer = L.tileLayer.wms('http://localhost:8080/geoserver/selene/wms', {
-    //  layers: '56d64f9a7a0066f09b0b5c42b31f3a3e936a3b0351e88393f39d118e',
-    //  transparent: true,
-    //   }).addTo(map);
+    wmsLayer = L.tileLayer.wms('http://localhost:8080/geoserver/selene/wms', {
+     layers: '56d64f9a7a0066f09b0b5c42b31f3a3e936a3b0351e88393f39d118e',
+     transparent: true,
+      }).addTo(map);
 
+      // The geoJSON layer used to display vector data
     geoJSONLayer = L.geoJSON(null, {
         onEachFeature: onEachFeature,
         pointToLayer: function(point, latlng) {
@@ -140,40 +155,44 @@ map.on('baselayerchange', (e) => {
     }
 });
 
-map.on('click', (e) => {
-
-  var loc = L.latLng(e.latlng.lat, e.latlng.lng);
-  let curZoom = map.getZoom();
-  if(curZoom < 6) map.setZoomAround(loc,6);
-  map.panTo(loc);
-
-  let bounds = map.getBounds();
-  let sw = bounds.getSouthWest();
-  let ne = bounds.getNorthEast()
-  console.log(bounds);
-
-  let query   = {"loc":{"$geoWithin":{"$box":[[sw.lat,sw.lng],[ne.lat,ne.lng]]}}};
-  let qry     = JSON.stringify(query);
-  let getstr  = `api/query/${qry}`;
-  console.log(getstr);
-  $.getJSON(getstr, (data) => {
-    console.log(data);
-    geoJSONLayer = null;
-    geoJSONLayer = L.geoJSON(null, {
-        onEachFeature: onEachFeature,
-        pointToLayer: function(point, latlng) {
-          let dotIcon = new L.DivIcon({
-            iconSize:     [7, 10],
-            className: 'leaflet-svg-icon',
-            html: `<svg width="7" height="10"><rect width="7" height="10" style="fill:rgb(255,0,0);stroke-width:1;stroke:rgb(0,0,50);" /></svg>`
-          });
-          return L.marker(latlng, {icon: dotIcon});
-        },
-    }).addTo(map);
-    plotPoints(geoJSONLayer, data.Points);
-  });
-});
-
+// Function to get the current frame and produce a geospatial query to generate
+// a new geoJSON layer. Commented as sponsors requested focus on raw queries
+// map.on('click', (e) => {
+//
+//   var loc = L.latLng(e.latlng.lat, e.latlng.lng);
+//   let curZoom = map.getZoom();
+//   if(curZoom < 6) map.setZoomAround(loc,6);
+//   map.panTo(loc);
+//
+//   let bounds = map.getBounds();
+//   let sw = bounds.getSouthWest();
+//   let ne = bounds.getNorthEast()
+//   console.log(bounds);
+//
+//   let query   = {"loc":{"$geoWithin":{"$box":[[sw.lat,sw.lng],[ne.lat,ne.lng]]}}};
+//   let qry     = JSON.stringify(query);
+//   let getstr  = `api/query/${qry}`;
+//   console.log(getstr);
+//   $.getJSON(getstr, (data) => {
+//     console.log(data);
+//     geoJSONLayer = null;
+//     geoJSONLayer = L.geoJSON(null, {
+//         onEachFeature: onEachFeature,
+//         pointToLayer: function(point, latlng) {
+//           let dotIcon = new L.DivIcon({
+//             iconSize:     [7, 10],
+//             className: 'leaflet-svg-icon',
+//             html: `<svg width="7" height="10"><rect width="7" height="10" style="fill:rgb(255,0,0);stroke-width:1;stroke:rgb(0,0,50);" /></svg>`
+//           });
+//           return L.marker(latlng, {icon: dotIcon});
+//         },
+//     }).addTo(map);
+//     plotPoints(geoJSONLayer, data.Points);
+//   });
+// });
+/*
+  Method to take the url GET query parameters and to handle the query.
+*/
 function updateQuery(urlQuery, geoJSONLayer) {
     console.log(urlQuery);
     //Base api url
@@ -181,6 +200,8 @@ function updateQuery(urlQuery, geoJSONLayer) {
     //Split on space
     let split = urlQuery.split(" ");
     console.log(split[0]);
+
+    console.log(split.length)
 
     // CASE: near query
     if (split[0].toLowerCase() === "near" && split.length == 3) {
@@ -192,7 +213,7 @@ function updateQuery(urlQuery, geoJSONLayer) {
     }
 
     // CASE: raw query
-    else if (split[0].toLowerCase() == "query" && split.length === 2) {
+    else if (split[0].toLowerCase() == "query") {
       let qry = split[1];
       console.log(qry);
       getstr +=`query/${qry}`;
@@ -219,34 +240,36 @@ function updateQuery(urlQuery, geoJSONLayer) {
 
     // CASE: layer request
     else if (split[0].toLowerCase() == "layer") {
-      getstr += `newImage/`;
-      if (split.length > 2){}
-      else{
-        if ( split.length == 1 ){}
-        else {
-          let qry = split[1];
-          getstr += `${qry}`;
-        }
-        $.getJSON(getstr, (data) => {
-          console.log(data);
-          if (data.error == 0){
-            wmsLayer = L.tileLayer.wms('http://localhost:8080/geoserver/selene/wms', {
-             layers: data.layer,
-             format: 'image/png',
-             transparent: true,
-             styles: 'bluered'
-              }).addTo(map);
-              wmsLayer.bringToFront();
-          }
-        });
+      getstr += `query/`;
+      if ( split.length == 1 ){}
+      else {
+        let qry = split[1];
+        getstr += `${qry}`;
       }
-      $.getJSON('api/points', (data) => {
-          plotPoints(geoJSONLayer, data.Points);
+      $.getJSON(getstr, (data) => {
+        console.log(data);
+        if (data.error == 0){
+          wmsLayer = L.tileLayer.wms('http://localhost:8080/geoserver/selene/wms', {
+           layers: data.layer,
+           format: 'image/png',
+           transparent: true,
+           styles: 'bluered'
+            }).addTo(map);
+            wmsLayer.bringToFront();
+        }
       });
+    $.getJSON('api/points', (data) => {
+        plotPoints(geoJSONLayer, data.Points);
+    });
     }
 
   }
 
+
+/*
+  Method to generate the data atrribute of the GeoJSON layer using GeoJSON point
+  objects from the database
+*/
 function plotPoints(geoJSONLayer, data) {
     // Grab the points of every element.
     let geoDataPoints = data.map(image =>
@@ -263,7 +286,12 @@ function plotPoints(geoJSONLayer, data) {
         .reduce((a, b) => a.concat(b), []);
     geoJSONLayer.addData(geoDataPoints);
 }
-// plot
+
+
+/*
+  Performs the same operation as plotPoints but using the angles collection,
+  which stores geospatial data differently
+*/
 function plotAngularPoints(geoJSONLayer, data) {
   let geoDataPoints = data.map(image =>
           image.pts.map((point, i) =>
@@ -279,6 +307,12 @@ function plotAngularPoints(geoJSONLayer, data) {
   geoJSONLayer.addData(geoDataPoints);
 }
 
+
+/*
+  Method used to generate a new reflectance dataset to be consumed by a chart.js
+  plot. It performs a rest API image request to get the reflectance data
+  associated with a specified point.
+*/
 function createRefData(point) {
     $.getJSON(`api/image/${point.eid}/${point.index}`, (data) => {
         const ref = binArray2FloatArray(data.ref1);
@@ -307,6 +341,10 @@ function createRefData(point) {
     });
 }
 
+
+/*
+  Method used to create a chart.js object given a valid dataset.
+*/
 function newChart(chdata) {
     let ctx = document.getElementById('refGraph');
     let chart = new Chart(ctx, {
@@ -318,7 +356,7 @@ function newChart(chdata) {
                 yAxes: [{
                     ticks: {
                         min: 0,
-                        max: 1,
+                        max: 1.2,
                     },
                 }],
             },
@@ -328,10 +366,16 @@ function newChart(chdata) {
     return chart
 }
 
+
+/*
+  Simple method to convert a string to a byte array, and from there to a Float32Array
+*/
 function binArray2FloatArray(string) {
     let byteArray = base64js.toByteArray(string);
     return new Float32Array(byteArray.buffer);
 }
+
+
 /*
   Taken from Stack Overflow answer: http://stackoverflow.com/a/901144/7286670
 */

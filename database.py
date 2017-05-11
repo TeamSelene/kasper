@@ -53,7 +53,6 @@ class SpectralProfiler(object):
 
     def __init__(self, host, port=27017, user=None, password=None):
         self.host = host
-        
         self.port = port
         self.user = user
 
@@ -73,7 +72,6 @@ class SpectralProfiler(object):
             projection["loc"] = True
 
         results = self.db[collection].find(query, projection, *args, **kwargs)
-        print results.count()
         if results.count() <= 150:
             return dumps(results)
         else:
