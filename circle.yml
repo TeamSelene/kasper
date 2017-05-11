@@ -2,12 +2,15 @@ machine:
     timezone: America/Phoenix
     node:
         version: 6
+
     python:
         version: 2.7.10
+
 database:
     override:
         - mongoimport --db selene --collection images --drop test/db/db.images.test.json
         - mongoimport --db selene --collection image_angles --drop test/db/db.image_angles.test.json
+
 
 dependencies:
     pre:
